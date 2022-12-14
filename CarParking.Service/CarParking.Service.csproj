@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="IService\" />
-    <Folder Include="Service\" />
+    <ProjectReference Include="..\CarParking.Data\CarParking.Data.csproj" />
+    <ProjectReference Include="..\CarParking.Dto\CarParking.Dto.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,3 +1,7 @@
+using CarParking.Data.Data;
+using CarParking.Data.IData;
+using CarParking.Service.IService;
+using CarParking.Service.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -33,6 +37,8 @@ namespace CarParking.Controller
         {
             services.AddControllersWithViews();
             string connectionString = Configuration.GetSection("ConnectionStrings:DefaultConnection:ConnectionString").Value;
+            services.AddScoped<IParkingService, ParkingService>();
+            services.AddScoped<IParkingData>(_ => new ParkingData(connectionString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

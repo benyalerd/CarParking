@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\CarParking.Service\CarParking.Service.csproj" />
   </ItemGroup>
 
 </Project>
