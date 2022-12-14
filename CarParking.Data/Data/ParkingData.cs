@@ -24,14 +24,14 @@ namespace CarParking.Data.Data
             try
             {
                 ExecuteNonQuery(SP_ADD_PARKING,
-                ("ParkingName", request.ParkingName),
-                ("ParkingAddress", request.ParkingAddress),
-                ("Email", request.Email),
-                ("Password", request.Password));
+                ("ParkingName", ConvertDTA(request.ParkingName)),
+                ("ParkingAddress", ConvertDTA(request.ParkingAddress)),
+                ("Email", ConvertDTA(request.Email)),
+                ("Password", ConvertDTA(request.Password)));
 
                 return true;
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
                 return false;
             }

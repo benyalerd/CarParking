@@ -38,7 +38,7 @@ namespace CarParking.Controller.Controllers
         }
 
         [HttpPost]
-        [Route("AddParking")]
+        [Route("ParkingLogIn")]
         public IActionResult ParkingLogIn([FromBody] GetParkingRequest request)
         {
 

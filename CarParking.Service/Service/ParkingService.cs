@@ -78,7 +78,7 @@ namespace CarParking.Service.Service
                     return response;
                 }
                 Parking parking = _parkingService.GetParkingByEmail(request.Email);
-                if (parking != null && parking.ParkingId != 0)
+                if (parking == null || parking.ParkingId == 0)
                 {
                     response.ErrorCode = "002";
                     response.ErrorMessage = "email or password is incorrect";
