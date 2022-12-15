@@ -9,24 +9,24 @@ namespace CarParking.Data
 
     public class BaseData
     {
-        SqlConnection cnn;
+        protected SqlConnection cnn;
+        protected SqlTransaction transaction;
+        
         public BaseData(string connetionString)
         {           
-            cnn = new SqlConnection(connetionString);          
+            cnn = new SqlConnection(connetionString);
+            cnn.Open();
         }
  
         protected DataSet ExecuteDataSet(string spName, params (string name, object value)[] parameterValues)
         {
-            SqlCommand objCmd = new SqlCommand();
             SqlDataAdapter dtAdapter = new SqlDataAdapter();
-
+            SqlCommand objCmd = new SqlCommand();
             DataSet ds = new DataSet();
-
             foreach (var param in parameterValues)
             {
                 objCmd.Parameters.AddWithValue(param.name, param.value);
             }
-            cnn.Open();
             objCmd.Connection = cnn;
             objCmd.CommandText = spName;
             objCmd.CommandType = CommandType.StoredProcedure;
@@ -34,30 +34,26 @@ namespace CarParking.Data
             dtAdapter.SelectCommand = objCmd;
             dtAdapter.Fill(ds);
 
-
-            cnn.Close();
             return ds;
         }
 
         protected void ExecuteNonQuery(string spName, params (string name, object value)[] parameterValues)
         {
             SqlCommand objCmd = new SqlCommand();
-
-
             foreach (var param in parameterValues)
             {
                 objCmd.Parameters.AddWithValue(param.name, param.value);
             }
 
-            cnn.Open();
             objCmd.Connection = cnn;
+            objCmd.Transaction = transaction;
             objCmd.CommandText = spName;
             objCmd.CommandType = CommandType.StoredProcedure;
 
             objCmd.ExecuteNonQuery();
 
-            cnn.Close();
-           
+            
+
         }
 
         #region ConvertDTA

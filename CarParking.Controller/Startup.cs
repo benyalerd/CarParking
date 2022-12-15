@@ -39,6 +39,8 @@ namespace CarParking.Controller
             string connectionString = Configuration.GetSection("ConnectionStrings:DefaultConnection:ConnectionString").Value;
             services.AddScoped<IParkingService, ParkingService>();
             services.AddScoped<IParkingData>(_ => new ParkingData(connectionString));
+            services.AddScoped<IFeeService, FeeService>();
+            services.AddScoped<IFeeData>(_ => new FeeData(connectionString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

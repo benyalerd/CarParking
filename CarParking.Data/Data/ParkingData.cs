@@ -39,6 +39,10 @@ namespace CarParking.Data.Data
             {
                 throw ex;
             }
+            finally
+            {
+                cnn.Close();
+            }
         }
 
         public Parking GetParkingByEmail(string email)
@@ -62,6 +66,10 @@ namespace CarParking.Data.Data
             catch (Exception ex)
             {
                 throw ex;
+            }
+            finally
+            {
+                cnn.Close();
             }
         }
     }
