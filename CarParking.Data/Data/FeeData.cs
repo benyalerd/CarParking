@@ -2,7 +2,6 @@
 using CarParking.Dto;
 using CarParking.Dto.Model.Request;
 using CarParking.Dto.Model.Response;
-using CarParking.Dto.Request;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -18,12 +17,17 @@ namespace CarParking.Data.Data
         private const string SP_GET_FEE_BY_PARKINGID = "[SP_GET_FEE_BY_PARKINGID]";
         private const string SP_UPDATE_TRANSACTION = "[SP_UPDATE_TRANSACTION]";
         private const string SP_ADD_TRANSACTION = "[SP_INSERT_TRANSACTION]";
+        private const string SP_GET_TRANSACTION_BY_TRAN_ID = "[SP_GET_TRANSACTION_BY_TRAN_ID]";
         #region Constructor
         public FeeData(string connetionString) : base(connetionString)
         {
         }
         #endregion
 
+        public void CloseConnection()
+        {
+            cnn.Close();
+        }
         public bool AddFee(InsertFeeRequest request)
         {
             try
@@ -49,10 +53,7 @@ namespace CarParking.Data.Data
                 transaction.Rollback();
                 throw ex;
             }
-            finally
-            {
-                cnn.Close();
-            }
+            
         }
 
         public bool UpdateFee(InsertFeeRequest request)
@@ -85,21 +86,18 @@ namespace CarParking.Data.Data
                 transaction.Rollback();
                 throw ex;
             }
-            finally
-            {
-                cnn.Close();
-            }
+         
         }
 
 
-        public ListFee GetFee(GetFeeRequest request)
+        public ListFee GetFee(int parkingId)
         {
             ListFee fee = new ListFee();
             DataNamesMapper<Fee> mapper = new DataNamesMapper<Fee>();
             try
             {
                 DataSet dsResults = ExecuteDataSet(SP_GET_FEE_BY_PARKINGID,
-                    ("ParkingId", ConvertDTA(request.ParkingId)));
+                    ("ParkingId", ConvertDTA(parkingId)));
                 if ((dsResults != null) && (dsResults.Tables[0].Rows.Count > 0))
                 {
                     if (dsResults.Tables[0].Rows[0][0] != System.DBNull.Value)
@@ -113,10 +111,7 @@ namespace CarParking.Data.Data
             {
                 throw ex;
             }
-            finally
-            {
-                cnn.Close();
-            }
+           
         }
 
         public InsertTransactionResponse InsertTransaction(InsertTransactionRequest request)
@@ -147,20 +142,20 @@ namespace CarParking.Data.Data
             }
         }
 
-        public bool UpdateTransaction(UpdateTransactionRequest request)
+        public bool UpdateTransaction(DateTime endDate,int hourDiscount,decimal fee,int hours,int transactionId)
         {
             try
             {
                 ExecuteNonQuery(SP_UPDATE_TRANSACTION,
-                ("endDate", ConvertDTA(request.EndDate)),
-                ("hourDiscount", ConvertDTA(request.HourDiscount)),
-                ("fee", ConvertDTA(request.Fee)),
-                ("hours", ConvertDTA(request.Hours)),
-                 ("transactionId", ConvertDTA(request.TransactionId)));
+                ("endDate", ConvertDTA(endDate)),
+                ("hourDiscount", ConvertDTA(hourDiscount)),
+                ("fee", ConvertDTA(fee)),
+                ("hours", ConvertDTA(hours)),
+                 ("transactionId", ConvertDTA(transactionId)));
 
                 return true;
             }
-            catch (SqlException ex)
+            catch (SqlException)
             {
                 return false;
             }
@@ -168,10 +163,32 @@ namespace CarParking.Data.Data
             {
                 throw ex;
             }
-            finally
-            {
-                cnn.Close();
-            }
+            
         }
+
+        public Transaction GetTransactionByTranId(int transId)
+        {
+            Transaction transaction = new Transaction();
+            DataNamesMapper<Transaction> mapper = new DataNamesMapper<Transaction>();
+            try
+            {
+                DataSet dsResults = ExecuteDataSet(SP_GET_TRANSACTION_BY_TRAN_ID,
+                    ("transactionId", ConvertDTA(transId)));
+                if ((dsResults != null) && (dsResults.Tables[0].Rows.Count > 0))
+                {
+                    if (dsResults.Tables[0].Rows[0][0] != System.DBNull.Value)
+                    {
+                        transaction = mapper.Map(dsResults.Tables[0].Rows[0]);
+                    }
+                }
+                return transaction;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+          
+        }
+
     }
 }

@@ -6,7 +6,7 @@ namespace CarParking.Dto.Model.Response
 {
     public class ListFee : BaseResponse
     {
-        public List<Fee> ListFees { get; set; }
+        public List<Fee> ListFees { get; set; } = new List<Fee>();
     }
 
     public class Fee

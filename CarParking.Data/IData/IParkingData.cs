@@ -8,6 +8,7 @@ namespace CarParking.Data.IData
 {
     public interface IParkingData
     {
+        void CloseConnection();
         bool AddParking(InsertParkingRequest request);
         Parking GetParkingByEmail(string email);
     }

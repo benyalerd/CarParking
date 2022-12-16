@@ -44,6 +44,10 @@ namespace CarParking.Service.Service
             {
                 throw ex;
             }
+            finally
+            {
+                _feeData.CloseConnection();
+            }
         }
 
         public InsertTransactionResponse InsertTransaction(InsertTransactionRequest request)
@@ -74,6 +78,10 @@ namespace CarParking.Service.Service
             catch (Exception ex)
             {
                 throw ex;
+            }
+            finally
+            {
+                _feeData.CloseConnection();
             }
         }
 
@@ -106,6 +114,101 @@ namespace CarParking.Service.Service
             {
                 throw ex;
             }
+            finally
+            {
+                _feeData.CloseConnection();
+            }
+        }
+
+        public BaseResponse UpdateTransaction(UpdateTransactionRequest request)
+        {
+            BaseResponse response = new BaseResponse();
+            try
+            {
+                if (request == null || request.TransactionId <= 0 || request.HourDiscount < 0)
+                {
+                    response.ErrorCode = "006";
+                    response.ErrorMessage = "request is invalid";
+                    return response;
+                }
+                Transaction transaction = _feeData.GetTransactionByTranId(request.TransactionId);
+                if (transaction == null || transaction.TransactionId == 0)
+                {
+                    response.ErrorCode = "006";
+                    response.ErrorMessage = "not found transaction";
+                    return response;
+                }
+                DateTime startDate = transaction.StartDate;
+                DateTime endDate = DateTime.Now;
+                decimal hourDiscount = request.HourDiscount * 60;
+             
+                decimal differentMinute = CalculateDifferenctMinute(startDate,endDate);
+                if(differentMinute < 0)
+                {
+                    differentMinute = 0;
+                }
+                int hour = (int)Math.Ceiling(differentMinute / 60);
+
+                decimal fee = 0;
+                ListFee listFee = _feeData.GetFee(transaction.ParkingId);
+                if (listFee == null || listFee.ListFees == null || listFee.ListFees.Count <=0)
+                {
+                    response.ErrorCode = "006";
+                    response.ErrorMessage = "not found fee";
+                    return response;
+                }
+
+                int existingHour = (int)Math.Ceiling(differentMinute / 60);
+                foreach (var feeItem in listFee.ListFees)
+                {
+                    if(feeItem.Period == 0)
+                    {
+                        if(existingHour > 0)
+                        {
+                            fee += (existingHour * feeItem.Charge);
+                        }
+                        break;
+                    }
+                    if(feeItem.Period < existingHour)
+                    {
+                        fee += (feeItem.Period * feeItem.Charge);
+                        existingHour -= feeItem.Period;
+                    }
+                    else
+                    {
+                        fee += (existingHour * feeItem.Charge);
+                        break;
+                    }
+
+                }
+                bool isAdd = _feeData.UpdateTransaction(endDate,request.HourDiscount,fee,hour,request.TransactionId);
+                if (!isAdd)
+                {
+                    response.ErrorCode = "005";
+                    response.ErrorMessage = "Failed to add or update parking";
+                    return response;
+                }
+
+                response.IsSuccess = true;
+                response.ErrorCode = "000";
+                response.ErrorMessage = "Success";
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                _feeData.CloseConnection();
+            }
+        }
+
+        private decimal CalculateDifferenctMinute(DateTime startDate,DateTime endDate)
+        {
+            decimal startDateMinute = (startDate.DayOfYear * 24 * 60) + (startDate.Hour * 60) + (startDate.Minute);
+            decimal endDateMinute = (endDate.DayOfYear * 24 * 60) + (endDate.Hour * 60) + (endDate.Minute);
+            return endDateMinute - startDateMinute;
         }
     }
 }

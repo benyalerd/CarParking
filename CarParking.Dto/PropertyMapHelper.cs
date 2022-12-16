@@ -61,6 +61,30 @@ namespace CarParking.Dto
                     prop.SetValue(entity, int.Parse(value.ToString()), null);
                 }
             }
+            else if (prop.PropertyType == typeof(decimal)
+                     || prop.PropertyType == typeof(decimal?))
+            {
+                if (value == null)
+                {
+                    prop.SetValue(entity, null, null);
+                }
+                else
+                {
+                    prop.SetValue(entity, decimal.Parse(value.ToString()), null);
+                }
+            }
+            else if (prop.PropertyType == typeof(DateTime)
+                    || prop.PropertyType == typeof(DateTime?))
+            {
+                if (value == null)
+                {
+                    prop.SetValue(entity, null, null);
+                }
+                else
+                {
+                    prop.SetValue(entity, DateTime.Parse(value.ToString()), null);
+                }
+            }
 
         }
     }

@@ -8,7 +8,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Text;
 
-namespace CarParking.Data.Data
+namespace CarParking.Data.Data 
 {
     public class ParkingData : BaseData, IParkingData
     {
@@ -19,6 +19,11 @@ namespace CarParking.Data.Data
         {
         }
         #endregion
+
+        public void CloseConnection()
+        {
+            cnn.Close();
+        }
         public bool AddParking(InsertParkingRequest request)
         {
             try
@@ -39,10 +44,7 @@ namespace CarParking.Data.Data
             {
                 throw ex;
             }
-            finally
-            {
-                cnn.Close();
-            }
+           
         }
 
         public Parking GetParkingByEmail(string email)
@@ -67,10 +69,7 @@ namespace CarParking.Data.Data
             {
                 throw ex;
             }
-            finally
-            {
-                cnn.Close();
-            }
+           
         }
     }
 }

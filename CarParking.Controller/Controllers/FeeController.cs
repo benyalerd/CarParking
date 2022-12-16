@@ -75,5 +75,23 @@ namespace CarParking.Controller.Controllers
             return Ok(baseResponse);
         }
 
+        [HttpPost]
+        [Route("UpdateTransaction")]
+        public IActionResult UpdateTransaction([FromBody] UpdateTransactionRequest request)
+        {
+
+            BaseResponse baseResponse = new BaseResponse();
+            try
+            {
+                baseResponse = _feeService.UpdateTransaction(request);
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ErrorMessage = ex.Message;
+                baseResponse.ErrorCode = "003";
+                baseResponse.IsSuccess = false;
+            }
+            return Ok(baseResponse);
+        }
     }
 }

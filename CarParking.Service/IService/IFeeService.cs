@@ -11,6 +11,7 @@ namespace CarParking.Service.IService
         BaseResponse AddFee(InsertFeeRequest request);
         InsertTransactionResponse InsertTransaction(InsertTransactionRequest request);
         BaseResponse UpdateFee(InsertFeeRequest request);
+        BaseResponse UpdateTransaction(UpdateTransactionRequest request);
 
     }
 }

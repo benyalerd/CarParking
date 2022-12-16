@@ -11,10 +11,10 @@ namespace CarParking.Service.Service
 {
     public class ParkingService : CommonValidation, IParkingService
     {
-        private readonly IParkingData _parkingService;
-        public ParkingService(IParkingData parkingService)
+        private readonly IParkingData _parkingData;
+        public ParkingService(IParkingData parkingData)
         {
-            _parkingService = parkingService;
+            _parkingData = parkingData;
         }
 
         public BaseResponse AddParking(InsertParkingRequest request)
@@ -34,7 +34,7 @@ namespace CarParking.Service.Service
                     response.ErrorMessage = "request is invalid";
                     return response;
                 }
-                Parking parking = _parkingService.GetParkingByEmail(request.Email);
+                Parking parking = _parkingData.GetParkingByEmail(request.Email);
                 if (parking != null && parking.ParkingId != 0)
                 {
                     response.ErrorCode = "004";
@@ -42,7 +42,7 @@ namespace CarParking.Service.Service
                     return response;
                 }
                 request.Password = ComputeSha256Hash(request.Password);
-                bool isAdd = _parkingService.AddParking(request);
+                bool isAdd = _parkingData.AddParking(request);
                 if (!isAdd)
                 {
                     response.ErrorCode = "005";
@@ -57,6 +57,10 @@ namespace CarParking.Service.Service
             catch (Exception ex)
             {
                 throw ex;
+            }
+            finally
+            {
+                _parkingData.CloseConnection();
             }
         }
 
@@ -77,7 +81,7 @@ namespace CarParking.Service.Service
                     response.ErrorMessage = "request is invalid";
                     return response;
                 }
-                Parking parking = _parkingService.GetParkingByEmail(request.Email);
+                Parking parking = _parkingData.GetParkingByEmail(request.Email);
                 if (parking == null || parking.ParkingId == 0)
                 {
                     response.ErrorCode = "002";
@@ -100,6 +104,10 @@ namespace CarParking.Service.Service
             catch (Exception ex)
             {
                 throw ex;
+            }
+            finally
+            {
+                _parkingData.CloseConnection();
             }
         }
     }
